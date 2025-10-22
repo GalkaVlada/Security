@@ -1,15 +1,17 @@
-function parseCurrency(value) {
-  return parseFloat(value.replace('$', ''));
-}
+// tests/currency.test.js
+const { parseCurrency, formatCurrency, addCurrencies } = require('../src/currency');
 
-function formatCurrency(value) {
-  return `$${value.toFixed(2)}`;
-}
+test('Перетворення валюти у число', () => {
+    expect(parseCurrency('$50')).toBe(50);
+    expect(parseCurrency('$30.25')).toBe(30.25);
+});
 
-function addCurrencies(value1, value2) {
-  const num1 = parseCurrency(value1);
-  const num2 = parseCurrency(value2);
-  return formatCurrency(num1 + num2);
-}
+test('Форматування числа у валюту', () => {
+    expect(formatCurrency(50)).toBe('$50.00');
+    expect(formatCurrency(30.25)).toBe('$30.25');
+});
 
-module.exports = { parseCurrency, formatCurrency, addCurrencies };
+test('Складання двох значень валюти', () => {
+    expect(addCurrencies('$50', '$30')).toBe('$80.00');
+    expect(addCurrencies('$20.75', '$9.25')).toBe('$30.00');
+});
