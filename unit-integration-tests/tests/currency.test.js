@@ -1,15 +1,13 @@
-function parseCurrency(value) {
-  return parseFloat(value.replace('$', ''));
-}
+const { parseCurrency, formatCurrency, addCurrencies } = require('../src/currency');
 
-function formatCurrency(value) {
-  return `$${value.toFixed(2)}`;
-}
+test('Парсинг валют', () => {
+  expect(parseCurrency('$12.50')).toBe(12.5);
+});
 
-function addCurrencies(value1, value2) {
-  const num1 = parseCurrency(value1);
-  const num2 = parseCurrency(value2);
-  return formatCurrency(num1 + num2);
-}
+test('Форматування валют', () => {
+  expect(formatCurrency(10)).toBe('$10.00');
+});
 
-module.exports = { parseCurrency, formatCurrency, addCurrencies };
+test('Додавання валют', () => {
+  expect(addCurrencies('$10.00', '$5.00')).toBe('$15.00');
+});

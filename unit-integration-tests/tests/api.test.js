@@ -5,4 +5,8 @@ async function fetchPosts() {
   return response.data;
 }
 
-module.exports = fetchPosts;
+test('API повертає масив постів', async () => {
+  const posts = await fetchPosts();
+  expect(Array.isArray(posts)).toBe(true);
+  expect(posts.length).toBeGreaterThan(0);
+});
