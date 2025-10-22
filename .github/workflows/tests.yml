@@ -1,0 +1,30 @@
+name: Run Automated Tests
+
+on:
+  workflow_dispatch: # Позволяет запускать вручную из интерфейса
+  push:
+    branches:
+      - main
+      - fix-login-bug
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Show test coverage (optional)
+        run: npm test -- --coverage
