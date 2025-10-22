@@ -4,12 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       grep:
-        description: 'tests to grep'
+        description: 'Tests to grep (filter by name)'
         required: false
         default: ''
       run:
+        description: 'Run a specific command instead of default'
         required: false
       testomatio:
+        description: 'Send results to Testomatio'
         required: false
 
 jobs:
@@ -25,12 +27,27 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Install dependencies
+        run: cd unit-integration-tests && npm install
+
       - name: Run tests
-        run: cd unit-integration-tests && npx jest
-      
-      - name: Show test coverage (optional)
-        run: cd unit-integration-tests && npx jest --coverage
+        run: |
+          cd unit-integration-tests
+          if [ "${{ github.event.inputs.run }}" != "" ]; then
+            # Запустить кастомную команду
+            echo "Running custom command: ${{ github.event.inputs.run }}"
+            eval "${{ github.event.inputs.run }}"
+          else
+            # Если указан grep, фильтруем тесты
+            if [ "${{ github.event.inputs.grep }}" != "" ]; then
+              npx jest --grep "${{ github.event.inputs.grep }}" --coverage
+            else
+              npx jest --coverage
+            fi
+          fi
 
-
-      - name: Show test coverage (optional)
-        run: cd unit-integration-tests && npm test -- --coverage
+      - name: Send results to Testomatio (optional)
+        if: ${{ github.event.inputs.testomatio }}
+        run: |
+          echo "Sending test results to Testomatio..."
+          # Здесь добавь команду для интеграции с Testomatio
