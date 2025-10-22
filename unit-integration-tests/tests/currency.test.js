@@ -1,13 +1,17 @@
+// tests/currency.test.js
 const { parseCurrency, formatCurrency, addCurrencies } = require('../src/currency');
 
-test('Парсинг валют', () => {
-  expect(parseCurrency('$12.50')).toBe(12.5);
+test('Перетворення валюти у число', () => {
+    expect(parseCurrency('$50')).toBe(50);
+    expect(parseCurrency('$30.25')).toBe(30.25);
 });
 
-test('Форматування валют', () => {
-  expect(formatCurrency(10)).toBe('$10.00');
+test('Форматування числа у валюту', () => {
+    expect(formatCurrency(50)).toBe('$50.00');
+    expect(formatCurrency(30.25)).toBe('$30.25');
 });
 
-test('Додавання валют', () => {
-  expect(addCurrencies('$10.00', '$5.00')).toBe('$15.00');
+test('Складання двох значень валюти', () => {
+    expect(addCurrencies('$50', '$30')).toBe('$80.00');
+    expect(addCurrencies('$20.75', '$9.25')).toBe('$30.00');
 });
