@@ -4,14 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       grep:
-        description: 'Tests to grep (filter by name)'
+        description: 'tests to grep'
         required: false
         default: ''
       run:
-        description: 'Run a specific command instead of default'
         required: false
       testomatio:
-        description: 'Send results to Testomatio'
         required: false
 
 jobs:
@@ -27,24 +25,44 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Debug — show current directory structure
+        run: |
+          pwd
+          ls -R .
+
       - name: Install dependencies
         run: |
-          cd unit-integration-tests
-          npm install
-          npm install @testomatio/reporter --save-dev
+          if [ -f "unit-integration-tests/package.json" ]; then
+            echo "Found package.json in unit-integration-tests. Installing dependencies..."
+            cd unit-integration-tests
+            npm install
+          elif [ -f "package.json" ]; then
+            echo "Found package.json in project root. Installing dependencies..."
+            npm install
+          else
+            echo "❌ No package.json found in expected locations!"
+            exit 1
+          fi
 
       - name: Run tests
-        env:
-          TESTOMATIO: ${{ secrets.TESTOMATIO }}
         run: |
-          cd unit-integration-tests
-          if [ "${{ github.event.inputs.run }}" != "" ]; then
-            echo "Running custom command: ${{ github.event.inputs.run }}"
-            eval "${{ github.event.inputs.run }}"
+          if [ -f "unit-integration-tests/package.json" ]; then
+            cd unit-integration-tests
+            npm test
+          elif [ -f "package.json" ]; then
+            npm test
           else
-            if [ "${{ github.event.inputs.grep }}" != "" ]; then
-              npx jest --grep "${{ github.event.inputs.grep }}" --reporters=default --reporters=@testomatio/reporter
-            else
-              npx jest --reporters=default --reporters=@testomatio/reporter
-            fi
+            echo "❌ No package.json found — skipping tests."
+            exit 1
+          fi
+
+      - name: Show test coverage (optional)
+        run: |
+          if [ -f "unit-integration-tests/package.json" ]; then
+            cd unit-integration-tests
+            npm test -- --coverage
+          elif [ -f "package.json" ]; then
+            npm test -- --coverage
+          else
+            echo "❌ No package.json found — cannot show coverage."
           fi
