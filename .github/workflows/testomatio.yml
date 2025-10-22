@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       grep:
-        description: 'tests to grep'
+        description: 'tests to grep '
         required: false
         default: ''
       run:
@@ -18,51 +18,18 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-
-      - name: Debug — show current directory structure
-        run: |
-          pwd
-          ls -R .
+          node-version: '20' # Укажите версию Node.js, соответствующую вашему проекту
 
       - name: Install dependencies
-        run: |
-          if [ -f "unit-integration-tests/package.json" ]; then
-            echo "Found package.json in unit-integration-tests. Installing dependencies..."
-            cd unit-integration-tests
-            npm install
-          elif [ -f "package.json" ]; then
-            echo "Found package.json in project root. Installing dependencies..."
-            npm install
-          else
-            echo "❌ No package.json found in expected locations!"
-            exit 1
-          fi
+        run: npm ci # или yarn install, в зависимости от вашего проекта
 
-      - name: Run tests
-        run: |
-          if [ -f "unit-integration-tests/package.json" ]; then
-            cd unit-integration-tests
-            npm test
-          elif [ -f "package.json" ]; then
-            npm test
-          else
-            echo "❌ No package.json found — skipping tests."
-            exit 1
-          fi
-
-      - name: Show test coverage (optional)
-        run: |
-          if [ -f "unit-integration-tests/package.json" ]; then
-            cd unit-integration-tests
-            npm test -- --coverage
-          elif [ -f "package.json" ]; then
-            npm test -- --coverage
-          else
-            echo "❌ No package.json found — cannot show coverage."
-          fi
+      - name: Run Jest tests
+        run: npx jest --runInBand --json --outputFile=jest-results.json ${{ github.event.inputs.grep }}
+        env:
+          TESTOMATIO: ${{ github.event.inputs.testomatio }}
+          TESTOMATIO_RUN: ${{ github.event.inputs.run }}
