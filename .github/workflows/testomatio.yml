@@ -25,11 +25,12 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install dependencies
-        run: cd unit-integration-tests && npm install
-
       - name: Run tests
-        run: cd unit-integration-tests && npm test
+        run: cd unit-integration-tests && npx jest
+      
+      - name: Show test coverage (optional)
+        run: cd unit-integration-tests && npx jest --coverage
+
 
       - name: Show test coverage (optional)
         run: cd unit-integration-tests && npm test -- --coverage
